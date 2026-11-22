@@ -18,10 +18,11 @@ export class UsersController {
     return this.usersService.findOne(request.userId);
   }
 
-  // No hay roles administrativos en el esquema actual.
+  // Listado mínimo para las pruebas académicas, con JWT.
   @Get()
-  findAll() {
-    throw new ForbiddenException('El listado de usuarios requiere permisos administrativos.');
+  async findAll(@Req() request: AuthenticatedRequest) {
+    await this.usersService.findOne(request.userId);
+    return this.usersService.findAll();
   }
 
   @Get(':id')
