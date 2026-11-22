@@ -1,34 +1,54 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  BadRequestException, Body, Controller, Delete, ForbiddenException,
+  Get, Param, ParseIntPipe, Patch, Req, UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import type { AuthenticatedRequest } from '../auth/jwt-auth.guard.js';
 import { UsersService } from './users.service.js';
-import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  // La creación de cuentas se realiza exclusivamente en POST /auth/register.
+  @Get('me')
+  findMe(@Req() request: AuthenticatedRequest) {
+    return this.usersService.findOne(request.userId);
   }
 
+  // Listado mínimo para las pruebas académicas, con JWT.
   @Get()
-  findAll() {
+  async findAll(@Req() request: AuthenticatedRequest) {
+    await this.usersService.findOne(request.userId);
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findOne(@Req() request: AuthenticatedRequest, @Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException('El ID debe ser un número entero.') })) id: number) {
+    this.validateOwner(request, id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(@Req() request: AuthenticatedRequest, @Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException('El ID debe ser un número entero.') })) id: number, @Body() dto: UpdateUserDto) {
+    this.validateOwner(request, id);
+    return this.usersService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Req() request: AuthenticatedRequest, @Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException('El ID debe ser un número entero.') })) id: number) {
+    this.validateOwner(request, id);
+    return this.usersService.remove(id);
+  }
+
+  private validateOwner(request: AuthenticatedRequest, id: number) {
+    if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
+      throw new BadRequestException('El ID debe ser un número entero positivo válido.');
+    }
+    if (id !== request.userId) {
+      throw new ForbiddenException('Solo podés acceder a tu propio perfil.');
+    }
   }
 }

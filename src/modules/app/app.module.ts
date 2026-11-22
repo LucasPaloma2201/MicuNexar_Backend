@@ -10,6 +10,7 @@ import { RequestsModule } from '../requests/requests.module.js';
 import { ServicesModule } from '../services/services.module.js';
 import { VenturesModule } from '../ventures/ventures.module.js';
 import { AuthModule } from '../auth/auth.module.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -23,6 +24,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     ServicesModule,
     VenturesModule,
     AuthModule,
+    PrismaModule,
     // Distributed tracing, auto-correlated logs, request/job metrics, error
     // telemetry, alarms, and more — out of the box. Sign up at https://observe.nestjs.com,
     // then run `npx @nestjs/observe link` to write your key pair into .env.
