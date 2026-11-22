@@ -16,14 +16,19 @@ export class UpdateRequestDto extends PartialType(
   { skipNullProperties: false },
 ) {
   @ValidateIf((_, value) => value !== undefined)
-  @IsIn([
-    'PENDING',
-    'ACCEPTED',
-    'IN_PROGRESS',
-    'AWAITING_CONFIRMATION',
-    'COMPLETED',
-    'CANCELLED',
-    'REJECTED',
-  ])
+  @IsIn(
+    [
+      'PENDING',
+      'ACCEPTED',
+      'IN_PROGRESS',
+      'AWAITING_CONFIRMATION',
+      'COMPLETED',
+      'CANCELLED',
+      'REJECTED',
+    ],
+    {
+      message: 'El estado de la solicitud no es válido.',
+    },
+  )
   status?: string;
 }

@@ -8,16 +8,18 @@ import {
 } from 'class-validator';
 
 export class CreateNexerDto {
-  @IsInt()
-  @Min(1)
+  @IsInt({ message: 'El ID del usuario debe ser un número entero.' })
+  @Min(1, { message: 'El ID del usuario debe ser mayor que cero.' })
   user_id!: number;
 
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(120)
+  @IsString({ message: 'El nombre público debe ser un texto.' })
+  @IsNotEmpty({ message: 'El nombre público del Nexer es obligatorio.' })
+  @MaxLength(120, {
+    message: 'El nombre público no puede superar los 120 caracteres.',
+  })
   public_name!: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'La descripción debe ser un texto.' })
   description?: string | null;
 }
