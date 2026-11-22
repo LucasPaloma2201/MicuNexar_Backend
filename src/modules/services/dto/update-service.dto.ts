@@ -1,4 +1,18 @@
-import { PartialType } from '@nestjs/mapped-types';
+import {
+  PartialType,
+  OmitType,
+} from '@nestjs/mapped-types';
+import {
+  IsBoolean,
+  ValidateIf,
+} from 'class-validator';
 import { CreateServiceDto } from './create-service.dto.js';
 
-export class UpdateServiceDto extends PartialType(CreateServiceDto) {}
+export class UpdateServiceDto extends PartialType(
+  OmitType(CreateServiceDto, ['nexer_id'] as const),
+  { skipNullProperties: false },
+) {
+  @ValidateIf((_, value) => value !== undefined)
+  @IsBoolean()
+  is_active?: boolean;
+}
