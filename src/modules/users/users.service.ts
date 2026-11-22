@@ -6,6 +6,13 @@ import { UpdateUserDto } from './dto/update-user.dto.js';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  findAll() {
+    return this.prisma.users.findMany({
+      select: { id: true, full_name: true },
+      orderBy: { id: 'asc' },
+    });
+  }
+
   async findOne(id: number) {
     const user = await this.prisma.users.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('El usuario no existe.');
