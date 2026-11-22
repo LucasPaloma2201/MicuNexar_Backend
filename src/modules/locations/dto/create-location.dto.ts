@@ -8,13 +8,19 @@ import {
 } from 'class-validator';
 
 export class CreateLocationDto {
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(120)
+  @IsString({ message: 'El nombre debe ser un texto.' })
+  @IsNotEmpty({ message: 'El nombre de la ubicación es obligatorio.' })
+  @MaxLength(120, {
+    message: 'El nombre no puede superar los 120 caracteres.',
+  })
   name!: string;
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
+  @IsInt({
+    message: 'El ID de la ubicación padre debe ser un número entero.',
+  })
+  @Min(1, {
+    message: 'El ID de la ubicación padre debe ser mayor que cero.',
+  })
   parent_id?: number | null;
 }
