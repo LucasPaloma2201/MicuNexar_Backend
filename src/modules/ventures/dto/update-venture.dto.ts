@@ -13,6 +13,8 @@ export class UpdateVentureDto extends PartialType(
   { skipNullProperties: false },
 ) {
   @ValidateIf((_, value) => value !== undefined)
-  @IsBoolean()
+  @IsBoolean({
+    message: 'El estado de activación debe ser verdadero o falso.',
+  })
   is_active?: boolean;
 }
