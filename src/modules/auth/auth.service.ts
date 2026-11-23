@@ -5,10 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { LoginAuthDto } from './dto/login-auth.dto.js';
 import { RegisterAuthDto } from './dto/register-auth.dto.js';
+import { hashPassword, verifyPassword } from './password.util.js';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +24,7 @@ export class AuthService {
       throw new BadRequestException('El nombre debe tener al menos 2 caracteres.');
     }
     this.validatePasswordLength(dto.password);
-    const passwordHash = await bcrypt.hash(dto.password, 12);
+    const passwordHash = await hashPassword(dto.password);
 
     try {
       // Prisma crea el usuario y sus credenciales en una operación atómica.
@@ -64,7 +64,7 @@ export class AuthService {
       },
     });
 
-    if (!user?.auth || !(await bcrypt.compare(dto.password, user.auth.password_hash))) {
+    if (!user?.auth || !(await verifyPassword(dto.password, user.auth.password_hash))) {
       throw new UnauthorizedException('Correo electrónico o contraseña incorrectos.');
     }
 
